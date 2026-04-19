@@ -2,42 +2,82 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-*{margin:0;padding:0;}
-body{
-background:url(https://p3-flow-image.cn/obj/doubao-chat-image/3f881d66f87e42489352f564d3509519) center no-repeat;
-background-size:cover;
-height:100vh;display:flex;align-items:center;justify-content:center;
-animation: imgInvert 7s infinite alternate;
-}
-@keyframes imgInvert{
-0%{filter:invert(0);}
-100%{filter:invert(1);}
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#222}
 
-#go{
-padding:14px 36px;
-backdrop-filter: blur 12px;
-border:none;border-radius:99px;
-font-size:19px;
-animation: btnColor 4s infinite alternate;
+/* 解锁轨道 */
+.slide-box{
+  width:320px;height:50px;background:#444;border-radius:30px;
+  position:relative;overflow:hidden;user-select:none
 }
-@keyframes btnColor{
-0%{background:rgba(0,0,0,0.35); color:#ffffff;}
-100%{background:rgba(255,255,255,0.35); color:#000000;}
+.slide-text{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  line-height:50px;text-align:center;color:#aaa;font-size:16px
 }
-#go:active{transform:scale(0.94);}
+.slide-btn{
+  width:46px;height:46px;background:#fff;border-radius:50%;
+  position:absolute;top:2px;left:2px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px #000;transition:background .2s
+}
+.ok .slide-btn{background:#4cd964}
+.ok .slide-text{color:#fff}
+
+.bottom-tip{
+  color:#FFD709;
+  margin-top:20px;
+  font-size:14px;
+}
 </style>
 </head>
 <body>
-<button id="go">点击进入领取地址</button>
+
+<div class="slide-box" id="lock">
+  <div class="slide-text">向右滑动进入</div>
+  <div class="slide-btn">→</div>
+</div>
+
+<div class="bottom-tip">真人验证🐔滑动即可进入</div>
 
 <script>
-var url = "https://niuma145.github.io/niu/";
- document.getElementById("go").onclick = function(){
- window.location.href = url;
- }
+const lock = document.getElementById('lock')
+const btn = lock.querySelector('.slide-btn')
+let isStart = false, maxX = lock.offsetWidth - btn.offsetWidth
+let success = false
+
+lock.addEventListener('mousedown',start)
+lock.addEventListener('touchstart',start)
+document.addEventListener('mousemove',move)
+document.addEventListener('touchmove',move)
+document.addEventListener('mouseup',end)
+document.addEventListener('touchend',end)
+
+function start(e){
+  if(success)return
+  isStart = true
+  e.preventDefault()
+}
+function move(e){
+  if(!isStart||success)return
+  let x = (e.touches?e.touches[0].clientX:e.clientX) - lock.getBoundingClientRect().left
+  x = Math.max(0,Math.min(x-btn.offsetWidth/2,maxX))
+  btn.style.left = x+'px'
+  
+  if(x >= maxX-10){
+    success = true
+    lock.classList.add('ok')
+    btn.style.left = maxX+'px'
+
+    window.location.href = "https://niuma145.github.io/fei/"
+
+  }
+}
+function end(){
+  isStart = false
+  if(!success)btn.style.left='2px'
+}
 </script>
 </body>
 </html>
